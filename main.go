@@ -32,11 +32,13 @@ func main() {
 
 		mParts := strings.Split(msg, " ")
 
+		uri := getUri(mParts[1])
+
 		// check local www folder for file in path
-		data, err := os.ReadFile(fmt.Sprintf("%s/%s", wwwFolderPath, mParts[1]))
+		data, err := os.ReadFile(fmt.Sprintf("%s/%s", wwwFolderPath, uri))
 		if err != nil {
 			if os.IsNotExist(err) {
-				resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n\r\nRequested path: %s\r\n", mParts[1])
+				resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n\r\nRequested path: %s\r\n", uri)
 				conn.Write([]byte(resp))
 				conn.Close()
 			}
@@ -46,4 +48,14 @@ func main() {
 		conn.Write([]byte(resp))
 		conn.Close()
 	}
+}
+
+func getUri(absPath string) string {
+	const defaultUri = "index.html"
+
+	if len(absPath[1:]) > 0 {
+		return absPath[1:]
+	}
+
+	return defaultUri
 }
